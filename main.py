@@ -1,20 +1,15 @@
-import pandas as pd
 from fastapi import FastAPI
-from starlette_exporter import PrometheusMiddleware, handle_metrics
-from prometheus_client import Counter
 from lib.model import ModelRunner
 from lib.data_loader import DataLoader
+from starlette_exporter import PrometheusMiddleware, handle_metrics
 
 app = FastAPI()
 app.add_middleware(PrometheusMiddleware)
 app.add_route("/metrics", handle_metrics)
 
-data_loader = DataLoader(debug=True)
+data_loader = DataLoader()
 model_runner = ModelRunner()
 print(f'Инициализация готова')
-
-SURVIVED_COUNTER = Counter("survived", "Number of survived passengers")
-PCLASS_COUNTER = Counter("pclass", "Number of passengers by class", ["pclass"])
 
 
 @app.get("/")
@@ -37,10 +32,9 @@ def read_healthcheck():
     return {"status": "Green", "version": "0.1.0"}
 
 
-@app.get("/predict")
+@app.get("/predict_sample")
 def predict():
-    test_data = data_loader.load_test_data().sample(1)  # val if debug otherwise test
-
+    test_data = data_loader.load_test_data().sample(1)
     preds = model_runner.get_predicts(test_data)
 
     return {
@@ -50,14 +44,15 @@ def predict():
     }
 
 
-@app.get("/retrain")
-def retrain():
-    test_data = data_loader.load_test_data().sample(1)  # val if debug otherwise test
-    train_data = data_loader.load_train_data().sample(5000)
+@app.get("/retrain/{records}")
+def retrain(records: str):
+    if int(records) <= 5000:
+        train_data = data_loader.load_train_data().sample(int(records))
+    else:
+        train_data = data_loader.load_train_data()
+
+    test_data = data_loader.load_test_data().sample(1)
 
     model_runner.retrain(test_data, train_data)
 
-    return {
-        "Status": "Prediction completed"
-    }
-
+    return {"Status": "Prediction completed"}

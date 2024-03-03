@@ -9,7 +9,7 @@ RUN wget http://download.cdn.yandex.net/mystem/mystem-3.1-linux-64bit.tar.gz && 
     tar -zxvf mystem-3.1-linux-64bit.tar.gz && rm -rf mystem-3.1-linux-64bit.tar.gz && \
     mv mystem ~/.local/bin
 
-COPY requirements.txt .
+COPY ../requirements.txt .
 RUN pip install --upgrade pip && pip install --no-cache-dir --prefer-binary -r requirements.txt
 
 ENV PROJECT_ROOT /app
@@ -37,7 +37,9 @@ RUN mkdir $HOME/t-model/  && \
     wget -O $HOME/t-model/pytorch_model.bin  https://storage.yandexcloud.net/varsey-backet/artifacts/tt-model/pytroch_model.bin
 
 COPY lib/ $PROJECT_ROOT/lib/
- RUN python3 -c "from lib.src.TransformerTrainer import TransformerTrainer; TransformerTrainer()"
- RUN python3 -c "import nltk; nltk.download('stopwords'); nltk.download('punkt'); nltk.download('averaged_perceptron_tagger')"
+RUN python3 -c "from lib.src.transformer_trainer import TransformerTrainer; TransformerTrainer()"
+RUN python3 -c "import nltk; nltk.download('stopwords'); nltk.download('punkt'); nltk.download('averaged_perceptron_tagger')"
 
-CMD python -m uvicorn main:app --reload
+COPY main.py $PROJECT_ROOT
+
+CMD python3 -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
