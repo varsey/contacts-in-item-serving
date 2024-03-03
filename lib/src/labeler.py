@@ -1,6 +1,7 @@
-import pandas as pd
 from typing import Optional
-from .Preprocessor import Preprocessor
+
+import pandas as pd
+from lib.src.preprocessor import Preprocessor
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.feature_selection import SelectKBest, chi2

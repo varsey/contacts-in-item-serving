@@ -1,5 +1,6 @@
-import pandas as pd
 import regex as re
+
+import pandas as pd
 
 
 class FeatureGenerator:

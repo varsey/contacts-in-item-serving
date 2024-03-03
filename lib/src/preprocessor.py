@@ -1,9 +1,10 @@
-import nltk
 import regex as re
+
+import nltk
 import pandas as pd
 from pymystem3 import Mystem
-from .Vectorizer import Vectorizer
-from .Augmenter import Augmenter
+from lib.src.vectorizer import Vectorizer
+from lib.src.augmenter import Augmenter
 pd.options.mode.chained_assignment = None
 
 

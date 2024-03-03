@@ -10,7 +10,7 @@ from lib.src.TransformerTrainer import TransformerTrainer
 PKL_DIR = '/lib/pkl/'
 
 
-class Task1:
+class ModelRunner:
     # Каталог сериализированных файлов
     model_files = {
         'lgbm_model_file': 'lgbm_model.pkl',

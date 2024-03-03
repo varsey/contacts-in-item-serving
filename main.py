@@ -1,23 +1,16 @@
-import os
-
 import pandas as pd
-import numpy as np
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from starlette_exporter import PrometheusMiddleware, handle_metrics
 from prometheus_client import Counter
-from sklearn.pipeline import Pipeline
-from lib.model import Task1
-from lib.run import Test
+from lib.model import ModelRunner
+from lib.run import DataLoader
 
 app = FastAPI()
 app.add_middleware(PrometheusMiddleware)
 app.add_route("/metrics", handle_metrics)
 
-print(f'Инициализация 1')
-# MODEL = os.getenv("MODEL", default="baseline.v1")
-test = Test(debug=True)
-print(f'Инициализация 2')
-task1 = Task1()
+data_loader = DataLoader(debug=True)
+model_runner = ModelRunner()
 print(f'Инициализация готова')
 
 SURVIVED_COUNTER = Counter("survived", "Number of survived passengers")
@@ -26,7 +19,7 @@ PCLASS_COUNTER = Counter("pclass", "Number of passengers by class", ["pclass"])
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "This is ML serving app"}
 
 
 @app.get("/hello/{name}")
@@ -41,17 +34,17 @@ def load_model():
 
 @app.get("/")
 def read_healthcheck():
-    return {"status": "Green", "version": "0.2.0"}
+    return {"status": "Green", "version": "0.1.0"}
 
 
 @app.get("/predict")
 def predict():
-    test_data = test.test_data().sample(1)  # val if debug otherwise test
-    train_data = test.train_data()
+    test_data = data_loader.load_test_data().sample(1)  # val if debug otherwise test
+    train_data = data_loader.load_train_data()
 
     task1_prediction = pd.DataFrame(columns=['index', 'prediction'])
     task1_prediction['index'] = test_data.index
-    task1_prediction['prediction'] = task1.predict(test_data, train_data, force_retrain=False)
+    task1_prediction['prediction'] = model_runner.predict(test_data, train_data, force_retrain=False)
 
     return {
         "text_id": test_data.index.values[0].__str__(),

@@ -5,7 +5,7 @@ import logging
 import pandas as pd
 
 
-class Test:
+class DataLoader:
     train_csv = 'train.csv'
     val_csv = 'val.csv'
     test_csv = 'test_data.csv'
@@ -27,7 +27,7 @@ class Test:
 
         return logger
 
-    def train_data(self) -> pd.DataFrame:
+    def load_train_data(self) -> pd.DataFrame:
         path = os.path.join(self.data_dir, self.train_csv)
         if not os.path.exists(path):
             self.logger.info(f'Файл {path} не найден')
@@ -39,7 +39,7 @@ class Test:
 
         return df
 
-    def val_data(self) -> pd.DataFrame:
+    def load_val_data(self) -> pd.DataFrame:
         path = os.path.join(self.data_dir, self.val_csv)
         if not os.path.exists(path):
             self.logger.info(f'Файл {path} не найден')
@@ -51,7 +51,7 @@ class Test:
 
         return df
 
-    def test_data(self) -> pd.DataFrame:
+    def load_test_data(self) -> pd.DataFrame:
         path = os.path.join(self.test_data_dir, self.val_csv if self.debug else self.test_csv)
         if not os.path.exists(path):
             self.logger.info(f'Файл {path} не найден')
@@ -61,6 +61,3 @@ class Test:
             del df['is_bad']
 
         return df
-
-
-

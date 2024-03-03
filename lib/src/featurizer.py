@@ -1,8 +1,8 @@
 import pandas as pd
-from .FeatureGenerator import FeatureGenerator
+from lib.src.feature_generator import FeatureGenerator
 
 
-class Featurzer:
+class Featurizer:
     @staticmethod
     def categorize_data(x_stacked, x_vect):
         print('Setting categories to data...')

@@ -1,9 +1,10 @@
 import os
 import pickle
-import GPUtil
 from typing import Optional, List
+
+import GPUtil
 import lightgbm as lgb
-from pandas import DataFrame as dft
+from pandas import DataFrame as pdf
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split, RepeatedStratifiedKFold
 from sklearn.metrics import roc_auc_score, accuracy_score
@@ -45,7 +46,7 @@ class Trainer:
 
         return None
 
-    def train_lgb(self, x_train: dft, x_test: dft, y_train: dft, y_test: dft, x: dft, y: dft) -> None:
+    def train_lgb(self, x_train: pdf, x_test: pdf, y_train: pdf, y_test: pdf, x: pdf, y: pdf) -> None:
         clf = lgb.LGBMClassifier(
             objective='binary',
             metric='auc',
@@ -72,7 +73,7 @@ class Trainer:
 
         return None
 
-    def train_lr(self, x_train: dft, x_test: dft, y_train: dft, y_test: dft, x: dft, y: dft) -> None:
+    def train_lr(self, x_train: pdf, x_test: pdf, y_train: pdf, y_test: pdf, x: pdf, y: pdf) -> None:
         lr_model = LogisticRegression(
             penalty='l2',
             solver='saga',
