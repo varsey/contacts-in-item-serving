@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  free-disk-space:
+  build-docker-image-and-push:
     runs-on: ubuntu-latest
     steps:
 

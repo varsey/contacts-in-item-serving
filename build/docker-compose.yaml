@@ -14,11 +14,11 @@ services:
         image: contacts-in-item:local
         container_name: contacts-in-item-local
         ports:
-          - "8080:8080"
+          - "8000:8000"
         volumes:
             - ../:/app
             - ../data:/data
         ipc: host
         shm_size: 4G
-        command: "python3 -m uvicorn main:app --host 0.0.0.0 --port 8080 --reload"
+        command: "python3 -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
         network_mode: none
