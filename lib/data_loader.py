@@ -8,10 +8,9 @@ import pandas as pd
 class DataLoader:
     train_csv = 'train.csv'
     val_csv = 'val.csv'
-    test_csv = 'test_data.csv'
 
-    def __init__(self, debug: bool = True):
-        self.debug = debug
+    def __init__(self, validate: bool = True):
+        self.validate = validate
         self.logger = self._get_logger()
         self.data_dir = os.getenv('DATA_ROOT')
         self.user = os.getenv('USER')
@@ -35,17 +34,8 @@ class DataLoader:
 
         return df
 
-    def load_val_data(self) -> pd.DataFrame:
-        path = os.path.join(self.data_dir, self.val_csv)
-        if not os.path.exists(path):
-            self.logger.info(f'Файл {path} не найден')
-            raise ValueError('val не найден')
-        df = pd.read_csv(path)
-
-        return df
-
     def load_test_data(self) -> pd.DataFrame:
-        path = os.path.join(self.data_dir, self.val_csv if self.debug else self.test_csv)
+        path = os.path.join(self.data_dir, self.val_csv)
         if not os.path.exists(path):
             self.logger.info(f'Файл {path} не найден')
             raise ValueError('test не найден')
