@@ -41,27 +41,7 @@ class ModelRunner:
             loaded_models[model_name] = self.load_pickle(model_name)
         return loaded_models
 
-    def predict(self, test_data: pd.DataFrame, train_data: pd.DataFrame, force_retrain: bool = False) -> float:
-
-        is_file_exists = [os.path.exists(f'{self.pre_path}{self.model_files[tag]}') for tag in self.model_files.keys()]
-        if force_retrain or not all(is_file_exists):
-            print("Started TRAIN data preprocessing")
-            train_x, train_data_a = self.pp.vectorizing_pipeline(train_data)
-
-            print("Started models training")
-            t = Trainer(pkl_dir=PKL_DIR, file_catalog=self.model_files, cat_feats_list=None)
-            t.train_on_data(train_x, train_data_a.is_bad)
-
-            data_train, data_test, _, _ = t.split_data(train_data_a, train_data_a.is_bad)
-            dd = self.tt.create_ddataset(data_train, data_test)
-            self.tt.train(
-                self.tt.encode_ddataset(dd)
-            )
-
-        if not os.path.exists(self.vocab_path):
-            print("Creating vocabulary")
-            self.pp.vectorizing_pipeline(train_data)
-
+    def get_predicts(self, test_data: pd.DataFrame) -> float:
         print("Started TEST data preprocessing")
         data_to_predict_on = self.pp.clean_df(test_data)
         test_x = self.pp.vectorize_to_nfeatures(data_to_predict_on)
@@ -71,10 +51,34 @@ class ModelRunner:
             print(model)
             y_pred += model.predict_proba(test_x)[:, 1]
 
-        print('tensorflow start')
+        print('Tensorflow processing start')
         tt_data_to_predict_on = self.tt.prepare_validation(data_to_predict_on[['text_cleaned']])
 
         tt_preds = self.loaded_tt.predict(tt_data_to_predict_on["validation"]).predictions[:, 1]
         y_pred += self.tt.sigmoid(tt_preds)
 
         return y_pred / (len(self.loaded_models) + 1)
+
+    def retrain(self, test_data: pd.DataFrame, train_data: pd.DataFrame = None) -> None:
+
+        print("Started TRAIN data preprocessing")
+        train_x, train_data_a = self.pp.vectorizing_pipeline(train_data)
+
+        print("Started models training")
+        t = Trainer(pkl_dir=PKL_DIR, file_catalog=self.model_files, cat_feats_list=None)
+        t.train_on_data(train_x, train_data_a.is_bad)
+
+        data_train, data_test, _, _ = t.split_data(train_data_a, train_data_a.is_bad)
+        dd = self.tt.create_ddataset(data_train, data_test)
+        self.tt.train(
+            self.tt.encode_ddataset(dd)
+        )
+
+        print("Creating vocabulary")
+        self.pp.vectorizing_pipeline(train_data)
+
+        print("Started TEST data preprocessing")
+        data_to_predict_on = self.pp.clean_df(test_data)
+        self.pp.vectorize_to_nfeatures(data_to_predict_on)
+
+        return None

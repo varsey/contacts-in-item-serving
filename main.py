@@ -40,15 +40,24 @@ def read_healthcheck():
 @app.get("/predict")
 def predict():
     test_data = data_loader.load_test_data().sample(1)  # val if debug otherwise test
-    train_data = data_loader.load_train_data()
 
-    task1_prediction = pd.DataFrame(columns=['index', 'prediction'])
-    task1_prediction['index'] = test_data.index
-    task1_prediction['prediction'] = model_runner.predict(test_data, train_data, force_retrain=False)
+    preds = model_runner.get_predicts(test_data)
 
     return {
         "text_id": test_data.index.values[0].__str__(),
         "text": test_data.description.values[0].__str__(),
-        "has_personal": task1_prediction.prediction.values[0].__str__()
+        "has_personal": preds.__str__()
+    }
+
+
+@app.get("/retrain")
+def retrain():
+    test_data = data_loader.load_test_data().sample(1)  # val if debug otherwise test
+    train_data = data_loader.load_train_data().sample(5000)
+
+    model_runner.retrain(test_data, train_data)
+
+    return {
+        "Status": "Prediction completed"
     }
 
