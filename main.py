@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from starlette_exporter import PrometheusMiddleware, handle_metrics
 from prometheus_client import Counter
 from lib.model import ModelRunner
-from lib.run import DataLoader
+from lib.data_loader import DataLoader
 
 app = FastAPI()
 app.add_middleware(PrometheusMiddleware)

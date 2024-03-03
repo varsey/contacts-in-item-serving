@@ -4,8 +4,8 @@ import logging
 
 import pandas as pd
 from lib.trainer import Trainer
-from lib.src.Preprocessor import Preprocessor
-from lib.src.TransformerTrainer import TransformerTrainer
+from lib.src.preprocessor import Preprocessor
+from lib.src.transformer_trainer import TransformerTrainer
 
 PKL_DIR = '/lib/pkl/'
 
