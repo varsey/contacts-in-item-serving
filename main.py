@@ -1,3 +1,5 @@
+import dataclasses
+
 import pandas as pd
 from fastapi import FastAPI
 from lib.model import ModelRunner
@@ -13,15 +15,18 @@ model_runner = ModelRunner()
 print(f'Инициализация готова')
 
 
+@dataclasses.dataclass
+class AdItem:
+    title: str
+    description: str
+    subcategory: str
+    category: str
+
+
+
 @app.get("/")
 async def root():
     return {"message": "This is ML serving app"}
-
-
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
-
 
 @app.on_event("startup")
 def load_model():
@@ -46,13 +51,8 @@ def predict():
 
 
 @app.post("/predict")
-def predict():
-    test_data = pd.DataFrame([{
-        'title': 'Мотоблок aurora country 6500 multi-shift',
-        'description': ' НОВЫЙ!!!/Объем двигателя389 см3Мощность двигателя13 л.с.Тип топливаБензиновыйСцеплениеДисковоеКоличество скоростей5-вперед,4-назадРеверс (задний ход)ЕстьШирина обработки170 смГлубина обработки30 смЕмкость топливного бака6.2 лОбъем масляного картера1.1 лСистема пускаручной стартерПодключение навесного оборудованияВОМКолёса в комплекте2.00-14Вес164 кгГабариты1800х1100х800 мм Образец.ПроизводительAuroraМодельCOUNTRY 1500 MULTI-SHIFT ',
-        'subcategory': 'Ремонт и строительство',
-        'category': 'Для дома и дачи',
-    }])
+def predict(item: AdItem):
+    test_data = pd.DataFrame([dataclasses.asdict(item)])
     preds = model_runner.get_predicts(test_data)
 
     return {
