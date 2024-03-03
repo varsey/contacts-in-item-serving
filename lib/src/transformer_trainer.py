@@ -87,9 +87,10 @@ class TransformerTrainer:
 
         predictions = trainer.predict(dd_encoded["test"])
         fpr, tpr, _ = roc_curve(dd_encoded["test"]['label'], predictions.predictions[:, 1])
+        # TO-DO add accuracy to compare with classic ml methods
         roc_auc = auc(fpr, tpr)
         print(f'ROC_AUC for Transformer: {roc_auc}')
-
+        # TO-DO add send to s3
         trainer.save_model('t-model', '.')
 
     def prepare_validation(self, data_val):

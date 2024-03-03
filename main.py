@@ -23,14 +23,9 @@ class AdItem:
     category: str
 
 
-
 @app.get("/")
 async def root():
     return {"message": "This is ML serving app"}
-
-@app.on_event("startup")
-def load_model():
-    pass
 
 
 @app.get("/")
@@ -61,6 +56,7 @@ def predict(item: AdItem):
         "has_personal": preds.__str__()
     }
 
+
 @app.get("/retrain/{records}")
 def retrain(records: str):
     if int(records) <= 5000:
@@ -68,8 +64,7 @@ def retrain(records: str):
     else:
         train_data = data_loader.load_train_data()
 
-    test_data = data_loader.load_test_data().sample(1)
-
+    test_data = data_loader.load_test_data().sample(100)
     model_runner.retrain(test_data, train_data)
 
     return {"Status": "Prediction completed"}

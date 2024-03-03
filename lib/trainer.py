@@ -1,5 +1,6 @@
 import os
 import pickle
+from datetime import datetime
 from typing import Optional, List
 
 import GPUtil
@@ -8,6 +9,7 @@ from pandas import DataFrame as pdf
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split, RepeatedStratifiedKFold
 from sklearn.metrics import roc_auc_score, accuracy_score
+from lib.src.s3_uploader import UploaderS3
 
 
 class Trainer:
@@ -18,6 +20,7 @@ class Trainer:
         self.cat_feats_list = cat_feats_list
         self.device_type = 'gpu' if len(GPUtil.getAvailable()) > 0 else 'cpu'
         print(f'Device type for training: {self.device_type}')
+        self.s3_client = UploaderS3()
 
     def split_data(self, x, y):
         x_train, x_test, y_train, y_test = train_test_split(x, y, shuffle=True,
@@ -37,14 +40,15 @@ class Trainer:
         return None
 
     @staticmethod
-    def see_roc_auc(model, x_test, y_test, y_pred) -> None:
+    def get_roc_auc(model, x_test, y_test, y_pred) -> float:
         accuracy = accuracy_score(y_test, y_pred)
         print(f'Accuracy: {accuracy:.3f}')
 
         y_pred_proba = model.predict_proba(x_test)[:, 1]
+        roc_auc = roc_auc_score(y_test, y_pred_proba)
         print(f'ROC-AUC score: {roc_auc_score(y_test, y_pred_proba):.3f}')
 
-        return None
+        return roc_auc
 
     def train_lgb(self, x_train: pdf, x_test: pdf, y_train: pdf, y_test: pdf, x: pdf, y: pdf) -> None:
         clf = lgb.LGBMClassifier(
@@ -65,11 +69,15 @@ class Trainer:
         pre_clf_model = clf.fit(x_train, y_train)
 
         y_pred = pre_clf_model.predict(x_test)
-        self.see_roc_auc(clf, x_test, y_test, y_pred)
+        roc_auc = self.get_roc_auc(clf, x_test, y_test, y_pred)
 
         print('Training final model on full ds...')
         clf_model = clf.fit(x, y)
         pickle.dump(clf_model, open(f'{self.pkl_dir}{self.file_catalog["lgbm_model_file"]}', 'wb'))
+        self.s3_client.upload_to_s3(
+            f'{self.pkl_dir}{self.file_catalog["lgbm_model_file"]}',
+            f'lgbm_model_file_{roc_auc:.5f}_{datetime.now()}.pkl'
+        )
 
         return None
 
@@ -83,10 +91,15 @@ class Trainer:
         )
         pre_lr_model= lr_model.fit(x_train, y_train)
         y_pred = pre_lr_model.predict(x_test)
-        self.see_roc_auc(pre_lr_model, x_test, y_test, y_pred)
+        roc_auc = self.get_roc_auc(pre_lr_model, x_test, y_test, y_pred)
 
         print('Training final model on full ds...')
         lr_model = lr_model.fit(x, y)
         pickle.dump(lr_model, open(f'{self.pkl_dir}{self.file_catalog["lr_model_file"]}', 'wb'))
+        self.s3_client.upload_to_s3(
+            f'{self.pkl_dir}{self.file_catalog["lr_model_file"]}',
+            f'lr_model_file_{roc_auc:.5f}_{datetime.now()}.pkl'
+        )
 
         return None
+
