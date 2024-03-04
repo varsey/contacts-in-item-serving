@@ -6,3 +6,6 @@
 OR 
 
 * sudo docker-compose -f build/docker-compose.yaml up
+
+## Slides
+Slide deck is [here](https://docs.google.com/presentation/d/1FyGRcOFEhQKE6yhlNu-c09ntF5k9UnRn9u648EhBhXo/edit?usp=sharing)
