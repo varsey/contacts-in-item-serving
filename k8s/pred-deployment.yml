@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: contacts-in-item-deployment
+  labels:
+    app: contacts-in-item
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: contacts-in-item
+  template:
+    metadata:
+      labels:
+        app: contacts-in-item
+    spec:
+      containers:
+        - name: contacts-in-item
+          env:
+            - name: DATA_ROOT
+              value: "/root/pkl/"
+            - name: USER
+              value: "root"
+            - name: BUCKET_NAME
+              value: "varsey-backet"
+          image: varsey/contacts-in-item-serving:0.2.0
+          ports:
+            - containerPort: 8000

@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: contacts-in-item-train-deployment
+  labels:
+    app: contacts-in-item-train
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: contacts-in-item-train
+  template:
+    metadata:
+      labels:
+        app: contacts-in-item-train
+    spec:
+      containers:
+        - name: contacts-in-item-train
+          env:
+            - name: DATA_ROOT
+              value: "/root/data/"
+            - name: TRAIN_DATA_FILENAME
+              value: "train.csv"
+            - name: VAL_DATA_FILENAME
+              value: "val.csv"
+            - name: USER
+              value: "root"
+            - name: BUCKET_NAME
+              value: "varsey-backet"
+          image: varsey/contacts-in-item-serving:0.2.0
+          ports:
+            - containerPort: 8000
