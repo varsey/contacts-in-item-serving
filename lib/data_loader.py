@@ -6,8 +6,8 @@ import pandas as pd
 
 
 class DataLoader:
-    train_csv = 'train.csv'
-    val_csv = 'val.csv'
+    train_csv = 'train.csv' if os.getenv('TRAIN_DATA_FILENAME') is None else os.getenv('TRAIN_DATA_FILENAME')
+    val_csv = 'val.csv' if os.getenv('VAL_DATA_FILENAME') is None else os.getenv('VAL_DATA_FILENAME')
 
     def __init__(self, validate: bool = True):
         self.validate = validate
