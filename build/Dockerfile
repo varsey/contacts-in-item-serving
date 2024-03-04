@@ -40,9 +40,9 @@ RUN mkdir $HOME/t-model/  && \
 RUN pip install boto3
 
 # Download pretrained pytroch model from s3 storage
-RUN mkdir $HOME/pkl/  && \
-    wget -O $HOME/pkl/train.csv  https://storage.yandexcloud.net/varsey-backet/train-data-compacted/train.csv &&  \
-    wget -O $HOME/pkl/val.csv  https://storage.yandexcloud.net/varsey-backet/train-data-compacted/val.csv
+RUN mkdir $HOME/data/  && \
+    wget -O $HOME/data/train.csv  https://storage.yandexcloud.net/varsey-backet/train-data-compacted/train.csv &&  \
+    wget -O $HOME/data/val.csv  https://storage.yandexcloud.net/varsey-backet/train-data-compacted/val.csv
 
 RUN mkdir $HOME/.aws/  && \
     wget -O $HOME/.aws/credentials https://storage.yandexcloud.net/varsey-backet/credentials
