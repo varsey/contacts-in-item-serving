@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from lib.model import ModelRunner
 from lib.data_loader import DataLoader
 from starlette_exporter import PrometheusMiddleware, handle_metrics
+from prometheus_client import Counter
 
 app = FastAPI()
 app.add_middleware(PrometheusMiddleware)
@@ -13,6 +14,9 @@ app.add_route("/metrics", handle_metrics)
 data_loader = DataLoader()
 model_runner = ModelRunner()
 print(f'Инициализация готова')
+
+TOTAL_PREDICTIONS = Counter("total", "Total number of predictions")
+FOUND_COUNTER = Counter("is_found", "Number of times personal info was detected")
 
 
 @dataclasses.dataclass
@@ -38,7 +42,9 @@ def predict():
     test_data = data_loader.load_test_data().sample(1)
     preds = model_runner.get_predicts(test_data)
     print('Using model files: ', model_runner.model_files)
-
+    TOTAL_PREDICTIONS.inc()
+    if preds > 0.5:
+        FOUND_COUNTER.inc()
     return {
         "text_id": test_data.index.values[0].__str__(),
         "text": test_data.description.values[0].__str__(),
