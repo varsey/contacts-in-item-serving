@@ -27,6 +27,6 @@ spec:
               value: "root"
             - name: BUCKET_NAME
               value: "varsey-backet"
-          image: varsey/contacts-in-item-serving:0.2.0
+          image: varsey/contacts-in-item-serving:0.3.0
           ports:
             - containerPort: 8000
