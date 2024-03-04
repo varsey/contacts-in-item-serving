@@ -12,9 +12,11 @@ PKL_DIR = '/lib/pkl/'
 
 class ModelRunner:
     # Каталог сериализированных файлов
+    lgbm_model_filename = os.getenv('LGBM_MODEL_FILENAME')
+    lr_model_filename = os.getenv('LR_MODEL_FILENAME')
     model_files = {
-        'lgbm_model_file': 'lgbm_model.pkl',
-        'lr_model_file': 'lr_model.pkl',
+        'lgbm_model_file': lgbm_model_filename if lgbm_model_filename is not None else 'lgbm_model.pkl',    # add os.getenv()
+        'lr_model_file': lr_model_filename if lr_model_filename is not None else 'lr_model.pkl',
     }
     n_features = 5000
     vocabulary_file = f'new_vocab_{n_features}.pkl'

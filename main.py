@@ -37,6 +37,7 @@ def read_healthcheck():
 def predict():
     test_data = data_loader.load_test_data().sample(1)
     preds = model_runner.get_predicts(test_data)
+    print('Using model files: ', model_runner.model_files)
 
     return {
         "text_id": test_data.index.values[0].__str__(),
