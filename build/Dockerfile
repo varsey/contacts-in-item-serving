@@ -36,12 +36,22 @@ RUN mkdir $HOME/t-model/  && \
     wget -O $HOME/t-model/training_args.bin  https://storage.yandexcloud.net/varsey-backet/artifacts/tt-model/training_args.bin &&  \
     wget -O $HOME/t-model/pytorch_model.bin  https://storage.yandexcloud.net/varsey-backet/artifacts/tt-model/pytroch_model.bin
 
+# TO-DO move to pip install reqs stage
+RUN pip install boto3
+
+# Download pretrained pytroch model from s3 storage
+RUN mkdir $HOME/pkl/  && \
+    wget -O $HOME/pkl/val.csv  https://storage.yandexcloud.net/varsey-backet/train-data-compacted/train.csv &&  \
+    wget -O $HOME/pkl/val.csv  https://storage.yandexcloud.net/varsey-backet/train-data-compacted/val.csv
+
+RUN mkdir $HOME/.aws/  && \
+    wget -O $HOME/.aws/credentials https://storage.yandexcloud.net/varsey-backet/credentials
+
 COPY lib/ $PROJECT_ROOT/lib/
 RUN python3 -c "from lib.src.transformer_trainer import TransformerTrainer; TransformerTrainer()"
 RUN python3 -c "import nltk; nltk.download('stopwords'); nltk.download('punkt'); nltk.download('averaged_perceptron_tagger')"
 
 COPY main.py $PROJECT_ROOT
 
-EXPOSE: 8000
-
-CMD python3 -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+# CMD python3 -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+CMD python3 -m uvicorn main:app
