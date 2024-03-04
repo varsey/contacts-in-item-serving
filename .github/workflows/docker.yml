@@ -45,7 +45,7 @@ jobs:
         context: ./
         file: ./build/Dockerfile
         push: true
-        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/contacts-in-item-serving:0.2.0
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/contacts-in-item-serving:0.3.0
 
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
