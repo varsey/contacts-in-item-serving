@@ -39,14 +39,6 @@ RUN mkdir $HOME/t-model/  && \
 # TO-DO move to pip install reqs stage
 RUN pip install boto3
 
-# Download pretrained pytroch model from s3 storage
-RUN mkdir $HOME/data/  && \
-    wget -O $HOME/data/train.csv  https://storage.yandexcloud.net/varsey-backet/train-data-compacted/train.csv &&  \
-    wget -O $HOME/data/val.csv  https://storage.yandexcloud.net/varsey-backet/train-data-compacted/val.csv
-
-RUN mkdir $HOME/.aws/  && \
-    wget -O $HOME/.aws/credentials https://storage.yandexcloud.net/varsey-backet/credentials
-
 COPY lib/ $PROJECT_ROOT/lib/
 RUN python3 -c "from lib.src.transformer_trainer import TransformerTrainer; TransformerTrainer()"
 RUN python3 -c "import nltk; nltk.download('stopwords'); nltk.download('punkt'); nltk.download('averaged_perceptron_tagger')"
